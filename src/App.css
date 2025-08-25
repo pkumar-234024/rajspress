@@ -11,7 +11,10 @@ body {
 
 .navbar-brand {
   font-weight: 700;
-  color: #4361ee !important;
+  background: linear-gradient(135deg, #4361ee, #3a56d4);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
 }
 
 .navbar-nav .nav-link {
@@ -25,18 +28,21 @@ body {
 
 /* Hero Section */
 h1 .text-primary {
-  color: #4361ee !important;
+  background: linear-gradient(135deg, #4361ee, #3a56d4);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
 }
 
 .btn-primary {
-  background-color: #4361ee !important;
-  border-color: #4361ee !important;
+  background: linear-gradient(135deg, #4361ee, #3a56d4) !important;
+  border: none !important;
   font-weight: 500;
   transition: all 0.3s ease;
 }
 
 .btn-primary:hover {
-  background-color: #3a56d4 !important;
+  background: linear-gradient(135deg, #3a56d4, #2f4bbe) !important;
   transform: translateY(-2px);
   box-shadow: 0 4px 12px rgba(67, 97, 238, 0.2);
 }

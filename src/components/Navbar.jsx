@@ -36,9 +36,9 @@ const Navbar = () => {
               <Link className="nav-link px-3" to="/admin">Admin</Link>
             </li>
           </ul>
-          <Link to="/cart" className="btn btn-outline-primary">
+          {/* <Link to="/cart" className="btn btn-outline-primary">
             <FontAwesomeIcon icon={faShoppingCart} /> Cart
-          </Link>
+          </Link> */}
         </div>
       </div>
     </nav>

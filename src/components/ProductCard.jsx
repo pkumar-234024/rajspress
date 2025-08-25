@@ -23,18 +23,18 @@ const ProductCard = ({ product }) => {
 
   return (
     <div className="card h-100 product-card border-0 shadow-sm">
-      <Link to={`/products/${product.id}`} className="text-decoration-none">
+      <Link to={`/productDetail/${product.id}`} className="text-decoration-none">
         <img
-          src={product.image}
+          src={'https://localhost:57679/uploadimage/image/' + product.imageName}
           className="card-img-top"
-          alt={product.name}
+          alt={product.productName}
         />
         <div className="card-body">
-          <h5 className="card-title">{product.name}</h5>
+          <h5 className="card-title">{product.productName}</h5>
           <p className="card-text text-muted">{product.description}</p>
           <div className="d-flex align-items-center mb-2">
-            {renderRating(product.rating)}
-            <span className="ms-2 text-muted">{product.rating} ({product.reviewCount})</span>
+            {renderRating(product.productRating)}
+            <span className="ms-2 text-muted">{product.productRating} ({product.numberOfReviews})</span>
           </div>
         </div>
       </Link>

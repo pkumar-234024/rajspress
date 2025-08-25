@@ -20,7 +20,8 @@ const Products = () => {
       try {
         setLoading(true);
         const data = await fetchProducts();
-        setProducts(data);
+        console.log(data.value);
+        setProducts(data.value);
         setLoading(false);
       } catch (err) {
         setError('Failed to fetch products');
@@ -31,82 +32,16 @@ const Products = () => {
     getProducts();
   }, []);
 
-  // Sample products data for demonstration
-  const sampleProducts = [
-    {
-      id: 1,
-      name: 'Banner Printing',
-      description: 'Large format banner printing for events and advertising',
-      image: 'https://placehold.co/600x400/e9ecef/495057?text=Banner',
-      price: 29.99,
-      rating: 4.7,
-      reviewCount: 50,
-      category: 'Banners'
-    },
-    {
-      id: 2,
-      name: 'Brochure Design & Print',
-      description: 'Custom brochure design and high-quality printing',
-      image: 'https://placehold.co/600x400/e9ecef/495057?text=Brochure',
-      price: 19.99,
-      rating: 4.6,
-      reviewCount: 73,
-      category: 'Brochures'
-    },
-    {
-      id: 3,
-      name: 'Business Cards',
-      description: 'Professional business cards with premium quality',
-      image: 'https://placehold.co/600x400/e9ecef/495057?text=BusinessCards',
-      price: 9.99,
-      rating: 4.8,
-      reviewCount: 89,
-      category: 'Cards'
-    },
-    {
-      id: 4,
-      name: 'Letterhead Design',
-      description: 'Professional letterhead design and printing',
-      image: 'https://placehold.co/600x400/e9ecef/495057?text=Letterhead',
-      price: 14.99,
-      rating: 4.8,
-      reviewCount: 31,
-      category: 'Stationery'
-    },
-    {
-      id: 5,
-      name: 'Flyer Printing',
-      description: 'High-quality flyer printing for promotions',
-      image: 'https://placehold.co/600x400/e9ecef/495057?text=Flyer',
-      price: 12.99,
-      rating: 4.5,
-      reviewCount: 45,
-      category: 'Flyers'
-    },
-    {
-      id: 6,
-      name: 'Poster Design',
-      description: 'Eye-catching poster design and printing',
-      image: 'https://placehold.co/600x400/e9ecef/495057?text=Poster',
-      price: 24.99,
-      rating: 4.7,
-      reviewCount: 62,
-      category: 'Posters'
-    }
-  ];
-
   // Filter products based on search term and category
-  const filteredProducts = sampleProducts.filter(product => {
-    const matchesSearch = product.name.toLowerCase().includes(searchTerm.toLowerCase()) || 
+  const filteredProducts = (Array.isArray(products) ? products : []).filter(product => {
+    const matchesSearch = product.productName.toLowerCase().includes(searchTerm.toLowerCase()) || 
                          product.description.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesCategory = category === 'All' || product.category === category;
-    return matchesSearch && matchesCategory;
+    return matchesSearch;
   });
 
-  // Sort products based on selected sort option
   const sortedProducts = [...filteredProducts].sort((a, b) => {
     if (sortBy === 'Name') {
-      return a.name.localeCompare(b.name);
+      return a.productName.localeCompare(b.productName);
     } else if (sortBy === 'Price: Low to High') {
       return a.price - b.price;
     } else if (sortBy === 'Price: High to Low') {
@@ -187,15 +122,15 @@ const Products = () => {
       </div>
 
       {/* Products Count and Cart */}
-      <div className="d-flex justify-content-between align-items-center mb-4">
-        <p className="mb-0">Showing {sortedProducts.length} of {sampleProducts.length} products</p>
+      {/* <div className="d-flex justify-content-between align-items-center mb-4">
+        <p className="mb-0">Showing {sortedProducts.length} of {(Array.isArray(products) ? products : []).length} products</p>
         <div className="cart-icon">
           <Link to="/cart" className="text-decoration-none">
             <FontAwesomeIcon icon={faShoppingCart} className="me-2" />
             <span>{cartItems} items in cart</span>
           </Link>
         </div>
-      </div>
+      </div> */}
 
       {/* Product Grid */}
       <div className="row g-4">
