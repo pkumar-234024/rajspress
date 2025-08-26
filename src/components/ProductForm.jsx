@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { createProduct, updateProduct } from '../services/api';
 
 const ProductForm = ({ product, onClose }) => {
@@ -7,6 +7,7 @@ const ProductForm = ({ product, onClose }) => {
     price: 0,
     description: '',
     imageName: '',
+    imagePath: '',
     categoryId: 1,
     productRating: 0,
     numberOfReviews: 0,
@@ -24,6 +25,9 @@ const ProductForm = ({ product, onClose }) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [featuresInput, setFeaturesInput] = useState('');
+  const [selectedFile, setSelectedFile] = useState(null);
+  const [previewUrl, setPreviewUrl] = useState('');
+  const fileInputRef = useRef(null);
 
   useEffect(() => {
     if (product) {
@@ -36,8 +40,31 @@ const ProductForm = ({ product, onClose }) => {
       setFeaturesInput(Array.isArray(product.productFeatures) 
         ? product.productFeatures.join(', ') 
         : (product.productFeatures || ''));
+      
+      // Set preview URL if product has an image path
+      if (product.imagePath) {
+        setPreviewUrl(product.imagePath);
+      }
     }
   }, [product]);
+  
+  const handleFileChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setSelectedFile(file);
+      setFormData({
+        ...formData,
+        imageName: file.name
+      });
+      
+      // Create a preview URL for the selected image
+      const fileReader = new FileReader();
+      fileReader.onload = () => {
+        setPreviewUrl(fileReader.result);
+      };
+      fileReader.readAsDataURL(file);
+    }
+  };
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -55,23 +82,38 @@ const ProductForm = ({ product, onClose }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     
-    // Process features from comma-separated string to array
-    const processedFormData = {
-      ...formData,
-      productFeatures: featuresInput.split(',').map(feature => feature.trim()).filter(Boolean)
-    };
-    
     try {
       setLoading(true);
       setError(null);
       
+      // Create FormData object for file upload
+      const formDataToSend = new FormData();
+      
+      // Process features from comma-separated string to array
+      const productFeatures = featuresInput.split(',').map(feature => feature.trim()).filter(Boolean);
+      
+      // Add all form fields to FormData
+      Object.keys(formData).forEach(key => {
+        if (key !== 'productFeatures') {
+          formDataToSend.append(key, formData[key]);
+        }
+      });
+      
+      // Add productFeatures as JSON string
+      formDataToSend.append('productFeatures', JSON.stringify(productFeatures));
+      
+      // Add file if selected
+      if (selectedFile) {
+        formDataToSend.append('imageFile', selectedFile);
+      }
+      
       let response;
       if (product) {
         // Update existing product
-        response = await updateProduct(product.id, processedFormData);
+        response = await updateProduct(product.id, formDataToSend);
       } else {
         // Create new product
-        response = await createProduct(processedFormData);
+        response = await createProduct(formDataToSend);
       }
       
       if (response.isSuccess) {
@@ -80,6 +122,7 @@ const ProductForm = ({ product, onClose }) => {
         setError('Failed to save product');
       }
     } catch (err) {
+      console.error('Error saving product:', err);
       setError('Error saving product');
     } finally {
       setLoading(false);
@@ -140,15 +183,25 @@ const ProductForm = ({ product, onClose }) => {
           
           <div className="row">
             <div className="col-md-6 mb-3">
-              <label htmlFor="imageName" className="form-label">Image Name</label>
+              <label htmlFor="imageFile" className="form-label">Product Image</label>
               <input
-                type="text"
+                type="file"
                 className="form-control"
-                id="imageName"
-                name="imageName"
-                value={formData.imageName}
-                onChange={handleChange}
+                id="imageFile"
+                name="imageFile"
+                accept="image/*"
+                onChange={handleFileChange}
+                ref={fileInputRef}
               />
+              {previewUrl && (
+                <div className="mt-2">
+                  <img 
+                    src={previewUrl} 
+                    alt="Product preview" 
+                    style={{ maxWidth: '100%', maxHeight: '150px', objectFit: 'contain' }} 
+                  />
+                </div>
+              )}
             </div>
             
             <div className="col-md-6 mb-3">

@@ -2,8 +2,39 @@ import { Link } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faShoppingCart } from '@fortawesome/free-solid-svg-icons';
 import 'bootstrap/dist/css/bootstrap.min.css';
+import { useEffect } from 'react';
+import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 
 const Navbar = () => {
+  useEffect(() => {
+    // Initialize Bootstrap's collapse functionality
+    const navbarToggler = document.querySelector('.navbar-toggler');
+    const navbarCollapse = document.querySelector('.navbar-collapse');
+    
+    if (navbarToggler) {
+      navbarToggler.addEventListener('click', () => {
+        navbarCollapse.classList.toggle('show');
+      });
+    }
+    
+    // Close menu when clicking outside
+    document.addEventListener('click', (e) => {
+      if (!navbarToggler?.contains(e.target) && !navbarCollapse?.contains(e.target) && navbarCollapse?.classList.contains('show')) {
+        navbarCollapse.classList.remove('show');
+      }
+    });
+    
+    // Cleanup event listeners on component unmount
+    return () => {
+      if (navbarToggler) {
+        navbarToggler.removeEventListener('click', () => {
+          navbarCollapse.classList.toggle('show');
+        });
+      }
+      document.removeEventListener('click', () => {});
+    };
+  }, []);
+
   return (
     <nav className="navbar navbar-expand-lg navbar-light bg-white py-3">
       <div className="container">
@@ -15,7 +46,7 @@ const Navbar = () => {
           </svg>
           <span className="fw-bold">RajShree Printing Press</span>
         </Link>
-        <button className="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+        <button className="navbar-toggler" type="button" aria-label="Toggle navigation">
           <span className="navbar-toggler-icon"></span>
         </button>
         <div className="collapse navbar-collapse" id="navbarNav">

@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_URL = 'https://localhost:57679';
+const API_URL = 'https://allinone.runasp.net';
 
 export const fetchProducts = async () => {
   try {
@@ -24,7 +24,11 @@ export const getProductById = async (id) => {
 
 export const createProduct = async (productData) => {
   try {
-    const response = await axios.post(`${API_URL}/product/create`, productData);
+    const response = await axios.post(`${API_URL}/product/create`, productData, {
+      headers: {
+        'Content-Type': 'multipart/form-data'
+      }
+    });
     return response.data;
   } catch (error) {
     console.error('Error creating product:', error);
@@ -34,7 +38,11 @@ export const createProduct = async (productData) => {
 
 export const updateProduct = async (id, productData) => {
   try {
-    const response = await axios.put(`${API_URL}/product/update/${id}`, productData);
+    const response = await axios.put(`${API_URL}/product/update/${id}`, productData, {
+      headers: {
+        'Content-Type': 'multipart/form-data'
+      }
+    });
     return response.data;
   } catch (error) {
     console.error(`Error updating product with id ${id}:`, error);

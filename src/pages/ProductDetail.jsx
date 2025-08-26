@@ -75,7 +75,7 @@ const ProductDetail = () => {
           <div className="product-gallery">
             <div className="main-image mb-3">
               <img 
-                src={'https://localhost:57679/uploadimage/image/' + product.imageName || 'https://placehold.co/600x400'} 
+                src={'https://allinone.runasp.net/uploadimage/image/' + product.imageName || 'https://placehold.co/600x400'} 
                 className="img-fluid rounded shadow-sm" 
                 alt={product.productName || 'Product Image'} 
               />

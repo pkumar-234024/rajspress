@@ -20,12 +20,13 @@ const ProductCard = ({ product }) => {
 
     return stars;
   };
+  const fixedUrl = "https://allinone.runasp.net";
 
   return (
     <div className="card h-100 product-card border-0 shadow-sm">
       <Link to={`/productDetail/${product.id}`} className="text-decoration-none">
         <img
-          src={'https://localhost:57679/uploadimage/image/' + product.imageName}
+          src={fixedUrl + '/uploadimage/image/' + product.imageName}
           className="card-img-top"
           alt={product.productName}
         />
