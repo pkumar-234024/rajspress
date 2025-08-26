@@ -25,8 +25,8 @@ const ProductForm = ({ product, onClose }) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [featuresInput, setFeaturesInput] = useState('');
-  const [selectedFile, setSelectedFile] = useState(null);
-  const [previewUrl, setPreviewUrl] = useState('');
+  const [selectedFiles, setSelectedFiles] = useState([]);
+  const [previewUrls, setPreviewUrls] = useState([]);
   const fileInputRef = useRef(null);
 
   useEffect(() => {
@@ -41,28 +41,39 @@ const ProductForm = ({ product, onClose }) => {
         ? product.productFeatures.join(', ') 
         : (product.productFeatures || ''));
       
-      // Set preview URL if product has an image path
-      if (product.imagePath) {
-        setPreviewUrl(product.imagePath);
+      // Set preview URLs if product has images
+      if (product.images && Array.isArray(product.images)) {
+        setPreviewUrls(product.images);
+      } else if (product.imagePath) {
+        setPreviewUrls([product.imagePath]);
       }
     }
   }, [product]);
   
   const handleFileChange = (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      setSelectedFile(file);
-      setFormData({
-        ...formData,
-        imageName: file.name
+    const files = Array.from(e.target.files);
+    if (files.length > 0) {
+      setSelectedFiles(files);
+      
+      // Create preview URLs for the selected images
+      const newPreviewUrls = [];
+      
+      files.forEach(file => {
+        const fileReader = new FileReader();
+        fileReader.onload = () => {
+          newPreviewUrls.push(fileReader.result);
+          if (newPreviewUrls.length === files.length) {
+            setPreviewUrls(newPreviewUrls);
+          }
+        };
+        fileReader.readAsDataURL(file);
       });
       
-      // Create a preview URL for the selected image
-      const fileReader = new FileReader();
-      fileReader.onload = () => {
-        setPreviewUrl(fileReader.result);
-      };
-      fileReader.readAsDataURL(file);
+      // Set the first image name as the main image name
+      setFormData({
+        ...formData,
+        imageName: files[0].name
+      });
     }
   };
 
@@ -102,9 +113,11 @@ const ProductForm = ({ product, onClose }) => {
       // Add productFeatures as JSON string
       formDataToSend.append('productFeatures', JSON.stringify(productFeatures));
       
-      // Add file if selected
-      if (selectedFile) {
-        formDataToSend.append('imageFile', selectedFile);
+      // Add files if selected
+      if (selectedFiles.length > 0) {
+        selectedFiles.forEach((file, index) => {
+          formDataToSend.append(`imageFiles`, file);
+        });
       }
       
       let response;
@@ -183,7 +196,7 @@ const ProductForm = ({ product, onClose }) => {
           
           <div className="row">
             <div className="col-md-6 mb-3">
-              <label htmlFor="imageFile" className="form-label">Product Image</label>
+              <label htmlFor="imageFile" className="form-label">Product Images</label>
               <input
                 type="file"
                 className="form-control"
@@ -192,14 +205,35 @@ const ProductForm = ({ product, onClose }) => {
                 accept="image/*"
                 onChange={handleFileChange}
                 ref={fileInputRef}
+                multiple
               />
-              {previewUrl && (
-                <div className="mt-2">
-                  <img 
-                    src={previewUrl} 
-                    alt="Product preview" 
-                    style={{ maxWidth: '100%', maxHeight: '150px', objectFit: 'contain' }} 
-                  />
+              {previewUrls.length > 0 && (
+                <div className="mt-2 d-flex flex-wrap">
+                  {previewUrls.map((url, index) => (
+                    <div key={index} className="me-2 mb-2" style={{ position: 'relative' }}>
+                      <img 
+                        src={url} 
+                        alt={`Product preview ${index + 1}`} 
+                        style={{ width: '80px', height: '80px', objectFit: 'cover', borderRadius: '4px' }} 
+                      />
+                      <button 
+                        type="button" 
+                        className="btn btn-sm btn-danger position-absolute" 
+                        style={{ top: '-8px', right: '-8px', borderRadius: '50%', padding: '0.2rem 0.5rem' }}
+                        onClick={() => {
+                          const newUrls = [...previewUrls];
+                          newUrls.splice(index, 1);
+                          setPreviewUrls(newUrls);
+                          
+                          const newFiles = [...selectedFiles];
+                          newFiles.splice(index, 1);
+                          setSelectedFiles(newFiles);
+                        }}
+                      >
+                        ×
+                      </button>
+                    </div>
+                  ))}
                 </div>
               )}
             </div>

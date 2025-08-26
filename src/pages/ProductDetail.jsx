@@ -74,26 +74,51 @@ const ProductDetail = () => {
         <div className="col-lg-6 mb-4">
           <div className="product-gallery">
             <div className="main-image mb-3">
+              {/* Display selected image or first image or default image */}
               <img 
-                src={'https://allinone.runasp.net/uploadimage/image/' + product.imageName || 'https://placehold.co/600x400'} 
+                src={
+                  product.images && product.images.length > 0 
+                    ? product.images[selectedImage] 
+                    : product.imageName 
+                      ? 'https://allinone.runasp.net/uploadimage/image/' + product.imageName 
+                      : 'https://placehold.co/600x400'
+                } 
                 className="img-fluid rounded shadow-sm" 
                 alt={product.productName || 'Product Image'} 
+                style={{ width: '100%', height: '400px', objectFit: 'contain' }}
               />
             </div>
-            <div className="d-flex thumbnail-container">
-              {product.images?.map((image, index) => (
+            <div className="d-flex thumbnail-container overflow-auto">
+              {/* If product has multiple images, show them as thumbnails */}
+              {product.images && product.images.length > 0 ? (
+                product.images.map((image, index) => (
+                  <div 
+                    key={index} 
+                    className={`thumbnail me-2 ${selectedImage === index ? 'border border-primary' : ''}`}
+                    onClick={() => setSelectedImage(index)}
+                    style={{ cursor: 'pointer' }}
+                  >
+                    <img 
+                      src={image || 'https://placehold.co/100x100'} 
+                      className="img-fluid rounded" 
+                      alt={`${product.productName || 'Thumbnail'} ${index + 1}`} 
+                      style={{ width: '80px', height: '80px', objectFit: 'cover' }}
+                    />
+                  </div>
+                ))
+              ) : product.imageName ? (
                 <div 
-                  key={index} 
-                  className={`thumbnail me-2 ${selectedImage === index ? 'active' : ''}`}
-                  onClick={() => setSelectedImage(index)}
+                  className="thumbnail me-2 border border-primary"
+                  style={{ cursor: 'pointer' }}
                 >
                   <img 
-                    src={image || 'https://placehold.co/100x100'} 
+                    src={'https://allinone.runasp.net/uploadimage/image/' + product.imageName} 
                     className="img-fluid rounded" 
-                    alt={`${product.productName || 'Thumbnail'} ${index + 1}`} 
+                    alt={product.productName || 'Thumbnail'} 
+                    style={{ width: '80px', height: '80px', objectFit: 'cover' }}
                   />
                 </div>
-              ))}
+              ) : null}
             </div>
           </div>
         </div>
