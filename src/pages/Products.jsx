@@ -19,12 +19,20 @@ const Products = () => {
     const getProducts = async () => {
       try {
         setLoading(true);
-        const data = await fetchProducts();
-        console.log(data.value);
-        setProducts(data.value);
-        setLoading(false);
+        setError(null);
+        const response = await fetchProducts();
+        // Ensure we're getting an array of products
+        const productsArray = Array.isArray(response) ? response : 
+                            Array.isArray(response?.value) ? response.value :
+                            Array.isArray(response?.data) ? response.data : 
+                            Array.isArray(response?.products) ? response.products : [];
+        //console.log('Products Array:', productsArray); // Debug log
+        setProducts(productsArray);
       } catch (err) {
-        setError('Failed to fetch products');
+        setError('Failed to fetch products. Please try again later.');
+        console.error('Error fetching products:', err);
+        setProducts([]); // Set empty array on error
+      } finally {
         setLoading(false);
       }
     };
@@ -33,21 +41,25 @@ const Products = () => {
   }, []);
 
   // Filter products based on search term and category
-  const filteredProducts = (Array.isArray(products) ? products : []).filter(product => {
-    const matchesSearch = product.productName.toLowerCase().includes(searchTerm.toLowerCase()) || 
-                         product.description.toLowerCase().includes(searchTerm.toLowerCase());
-    return matchesSearch;
+  const filteredProducts = products.filter(product => {
+    const matchesSearch = product.productName?.toLowerCase().includes(searchTerm.toLowerCase()) || 
+                         product.description?.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesCategory = category === 'All' || product.categoryId?.toString() === category;
+    return matchesSearch && matchesCategory;
   });
 
+  // Sort products based on selected sort option
   const sortedProducts = [...filteredProducts].sort((a, b) => {
     if (sortBy === 'Name') {
-      return a.productName.localeCompare(b.productName);
+      const nameA = (a?.productName || '').toLowerCase();
+      const nameB = (b?.productName || '').toLowerCase();
+      return nameA.localeCompare(nameB);
     } else if (sortBy === 'Price: Low to High') {
-      return a.price - b.price;
+      return (a?.price || 0) - (b?.price || 0);
     } else if (sortBy === 'Price: High to Low') {
-      return b.price - a.price;
+      return (b?.price || 0) - (a?.price || 0);
     } else if (sortBy === 'Rating') {
-      return b.rating - a.rating;
+      return (b?.productRating || 0) - (a?.productRating || 0);
     }
     return 0;
   });
@@ -95,12 +107,11 @@ const Products = () => {
               onChange={(e) => setCategory(e.target.value)}
             >
               <option value="All">All</option>
-              <option value="Banners">Banners</option>
-              <option value="Brochures">Brochures</option>
-              <option value="Cards">Cards</option>
-              <option value="Stationery">Stationery</option>
-              <option value="Flyers">Flyers</option>
-              <option value="Posters">Posters</option>
+              <option value="1">Category 1</option>
+              <option value="2">Category 2</option>
+              <option value="3">Category 3</option>
+              <option value="4">Category 4</option>
+              <option value="5">Category 5</option>
             </select>
           </div>
           <div className="me-3">
@@ -122,15 +133,15 @@ const Products = () => {
       </div>
 
       {/* Products Count and Cart */}
-      {/* <div className="d-flex justify-content-between align-items-center mb-4">
-        <p className="mb-0">Showing {sortedProducts.length} of {(Array.isArray(products) ? products : []).length} products</p>
+      <div className="d-flex justify-content-between align-items-center mb-4">
+        <p className="mb-0">Showing {sortedProducts.length} of {products.length} products</p>
         <div className="cart-icon">
           <Link to="/cart" className="text-decoration-none">
             <FontAwesomeIcon icon={faShoppingCart} className="me-2" />
             <span>{cartItems} items in cart</span>
           </Link>
         </div>
-      </div> */}
+      </div>
 
       {/* Product Grid */}
       <div className="row g-4">

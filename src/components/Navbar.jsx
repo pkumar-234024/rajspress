@@ -2,39 +2,8 @@ import { Link } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faShoppingCart } from '@fortawesome/free-solid-svg-icons';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import { useEffect } from 'react';
-import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 
 const Navbar = () => {
-  useEffect(() => {
-    // Initialize Bootstrap's collapse functionality
-    const navbarToggler = document.querySelector('.navbar-toggler');
-    const navbarCollapse = document.querySelector('.navbar-collapse');
-    
-    if (navbarToggler) {
-      navbarToggler.addEventListener('click', () => {
-        navbarCollapse.classList.toggle('show');
-      });
-    }
-    
-    // Close menu when clicking outside
-    document.addEventListener('click', (e) => {
-      if (!navbarToggler?.contains(e.target) && !navbarCollapse?.contains(e.target) && navbarCollapse?.classList.contains('show')) {
-        navbarCollapse.classList.remove('show');
-      }
-    });
-    
-    // Cleanup event listeners on component unmount
-    return () => {
-      if (navbarToggler) {
-        navbarToggler.removeEventListener('click', () => {
-          navbarCollapse.classList.toggle('show');
-        });
-      }
-      document.removeEventListener('click', () => {});
-    };
-  }, []);
-
   return (
     <nav className="navbar navbar-expand-lg navbar-light bg-white py-3">
       <div className="container">
@@ -45,8 +14,11 @@ const Navbar = () => {
             <path d="M2 12L12 17L22 12" stroke="#4F46E5" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
           </svg>
           <span className="fw-bold">RajShree Printing Press</span>
+          <span className={`badge ms-2 ${import.meta.env.MODE === 'development' ? 'bg-warning' : 'bg-success'}`}>
+            {import.meta.env.MODE}
+          </span>
         </Link>
-        <button className="navbar-toggler" type="button" aria-label="Toggle navigation">
+        <button className="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
           <span className="navbar-toggler-icon"></span>
         </button>
         <div className="collapse navbar-collapse" id="navbarNav">
@@ -67,9 +39,9 @@ const Navbar = () => {
               <Link className="nav-link px-3" to="/admin">Admin</Link>
             </li>
           </ul>
-          {/* <Link to="/cart" className="btn btn-outline-primary">
+          <Link to="/cart" className="btn btn-outline-primary">
             <FontAwesomeIcon icon={faShoppingCart} /> Cart
-          </Link> */}
+          </Link>
         </div>
       </div>
     </nav>

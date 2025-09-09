@@ -11,14 +11,50 @@ const ProductDetail = () => {
   const [error, setError] = useState(null);
   const [selectedImage, setSelectedImage] = useState(0);
 
-
+  // Sample product data for demonstration
+  const sampleProduct = {
+    id: 1,
+    productName: 'Banner Printing',
+    description: 'Large format banner printing for events and advertising',
+    price: 599,
+    productRating: 4.7,
+    numberOfReviews: 56,
+    inStock: true,
+    features: [
+      'Large format printing',
+      'Custom sizes',
+      'Installation support',
+      'Weather resistant',
+      'Fast production'
+    ],
+    specifications: {
+      material: 'Vinyl, Fabric, Mesh',
+      finishOptions: 'Matte, Glossy, Semi-Gloss',
+      sizes: 'Custom sizes available',
+      resolution: 'High-resolution printing (1440 dpi)',
+      turnaroundTime: '2-3 business days',
+      minimumOrder: '1 piece'
+    },
+    images: [
+      'https://placehold.co/600x400/e9ecef/495057?text=Banner1',
+      'https://placehold.co/600x400/e9ecef/495057?text=Banner2',
+      'https://placehold.co/600x400/e9ecef/495057?text=Banner3'
+    ]
+  };
 
   useEffect(() => {
     const fetchProductDetail = async () => {
       try {
-        const response = await getProductById(id);
-        console.log(response.value)
-        setProduct(response.value);
+        // In a real app, uncomment this to fetch from API
+        // const response = await getProductById(id);
+        // if (response.isSuccess) {
+        //   setProduct(response.value);
+        // } else {
+        //   setError('Failed to fetch product details');
+        // }
+        
+        // Using sample data for demonstration
+        setProduct(sampleProduct);
         setLoading(false);
       } catch (err) {
         setError('Error fetching product details');
@@ -46,7 +82,7 @@ const ProductDetail = () => {
   }
 
   // Render star ratings
-  const renderRating = (rating = 0) => {
+  const renderRating = (rating) => {
     const stars = [];
     const fullStars = Math.floor(rating);
     
@@ -74,51 +110,26 @@ const ProductDetail = () => {
         <div className="col-lg-6 mb-4">
           <div className="product-gallery">
             <div className="main-image mb-3">
-              {/* Display selected image or first image or default image */}
               <img 
-                src={
-                  product.images && product.images.length > 0 
-                    ? product.images[selectedImage] 
-                    : product.imageName 
-                      ? 'https://allinone.runasp.net/uploadimage/image/' + product.imageName 
-                      : 'https://placehold.co/600x400'
-                } 
+                src={product.images[selectedImage]} 
                 className="img-fluid rounded shadow-sm" 
-                alt={product.productName || 'Product Image'} 
-                style={{ width: '100%', height: '400px', objectFit: 'contain' }}
+                alt={product.productName} 
               />
             </div>
-            <div className="d-flex thumbnail-container overflow-auto">
-              {/* If product has multiple images, show them as thumbnails */}
-              {product.images && product.images.length > 0 ? (
-                product.images.map((image, index) => (
-                  <div 
-                    key={index} 
-                    className={`thumbnail me-2 ${selectedImage === index ? 'border border-primary' : ''}`}
-                    onClick={() => setSelectedImage(index)}
-                    style={{ cursor: 'pointer' }}
-                  >
-                    <img 
-                      src={image || 'https://placehold.co/100x100'} 
-                      className="img-fluid rounded" 
-                      alt={`${product.productName || 'Thumbnail'} ${index + 1}`} 
-                      style={{ width: '80px', height: '80px', objectFit: 'cover' }}
-                    />
-                  </div>
-                ))
-              ) : product.imageName ? (
+            <div className="d-flex thumbnail-container">
+              {product.images.map((image, index) => (
                 <div 
-                  className="thumbnail me-2 border border-primary"
-                  style={{ cursor: 'pointer' }}
+                  key={index} 
+                  className={`thumbnail me-2 ${selectedImage === index ? 'active' : ''}`}
+                  onClick={() => setSelectedImage(index)}
                 >
                   <img 
-                    src={'https://allinone.runasp.net/uploadimage/image/' + product.imageName} 
+                    src={image} 
                     className="img-fluid rounded" 
-                    alt={product.productName || 'Thumbnail'} 
-                    style={{ width: '80px', height: '80px', objectFit: 'cover' }}
+                    alt={`${product.productName} thumbnail ${index + 1}`} 
                   />
                 </div>
-              ) : null}
+              ))}
             </div>
           </div>
         </div>
@@ -126,20 +137,20 @@ const ProductDetail = () => {
         {/* Product Information */}
         <div className="col-lg-6">
           <div className="product-info bg-white p-4 rounded shadow-sm">
-            <h1 className="product-title mb-2">{product.productName || 'Product Name'}</h1>
+            <h1 className="product-title mb-2">{product.productName}</h1>
             
             <div className="d-flex align-items-center mb-2">
               <div className="me-2">
                 {renderRating(product.productRating)}
               </div>
-              <span className="text-muted">{product.productRating || 0} ({product.numberOfReviews || 0} reviews)</span>
+              <span className="text-muted">{product.productRating} ({product.numberOfReviews} reviews)</span>
             </div>
             
-            <p className="product-description text-muted mb-4">{product.description || 'No description available'}</p>
+            <p className="product-description text-muted mb-4">{product.description}</p>
             
             <div className="price-container d-flex justify-content-between align-items-center mb-4">
-              <h2 className="price mb-0">₹{product.price || 0}</h2>
-              <span className={`stock-status ${product.inStock ? 'text-success' : 'text-danger'}` || 'text-muted'}>
+              <h2 className="price mb-0">₹{product.price}</h2>
+              <span className={`stock-status ${product.inStock ? 'text-success' : 'text-danger'}`}>
                 {product.inStock ? 'In Stock' : 'Out of Stock'}
               </span>
             </div>
@@ -149,7 +160,7 @@ const ProductDetail = () => {
           <div className="key-features bg-white p-4 rounded shadow-sm mt-4">
             <h3 className="mb-3">Key Features</h3>
             <div className="row">
-              {(product.productFeatures || []).map((feature, index) => (
+              {product.features.map((feature, index) => (
                 <div key={index} className="col-md-6 mb-2">
                   <div className="d-flex align-items-center">
                     <FontAwesomeIcon icon={faCheck} className="text-success me-2" />
@@ -165,7 +176,7 @@ const ProductDetail = () => {
             <h3 className="mb-3">Specifications</h3>
             <table className="table table-borderless">
               <tbody>
-                {Object.entries(product.specifications || {}).map(([key, value], index) => (
+                {Object.entries(product.specifications).map(([key, value], index) => (
                   <tr key={index}>
                     <td className="text-muted" style={{ width: '40%' }}>{key.charAt(0).toUpperCase() + key.slice(1)}</td>
                     <td>{value}</td>

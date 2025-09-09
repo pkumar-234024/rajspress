@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faStar, faStarHalfAlt } from '@fortawesome/free-solid-svg-icons';
 
+const API_URL = import.meta.env.VITE_API_URL;
 const ProductCard = ({ product }) => {
   // Render star ratings
   const renderRating = (rating) => {
@@ -20,13 +21,12 @@ const ProductCard = ({ product }) => {
 
     return stars;
   };
-  const fixedUrl = "https://allinone.runasp.net";
 
   return (
     <div className="card h-100 product-card border-0 shadow-sm">
-      <Link to={`/productDetail/${product.id}`} className="text-decoration-none">
+      <Link to={`/products/${product.id}`} className="text-decoration-none">
         <img
-          src={fixedUrl + '/uploadimage/image/' + product.imageName}
+          src={`${API_URL}/uploadimage/image/${product.imageName}`}
           className="card-img-top"
           alt={product.productName}
         />
@@ -35,7 +35,7 @@ const ProductCard = ({ product }) => {
           <p className="card-text text-muted">{product.description}</p>
           <div className="d-flex align-items-center mb-2">
             {renderRating(product.productRating)}
-            <span className="ms-2 text-muted">{product.productRating} ({product.numberOfReviews})</span>
+            <span className="ms-2 text-muted">{product.productRating} ({product.numberOfReviews} reviews)</span>
           </div>
         </div>
       </Link>
